@@ -17,7 +17,7 @@ namespace RemoveDupes
         string destinationFilename;
         StreamReader sourceReader;
         StreamWriter destinationWriter;
-        int dupesCount = 0;
+        int dupesCount;
 
         public Form1()
         {
@@ -41,54 +41,37 @@ namespace RemoveDupes
 
             sourceReader = new StreamReader(sourceFilename);
             destinationWriter = new StreamWriter(destinationFilename);
-
-            var linesHash = new HashSet<int>();
+            
+            var linesString = new HashSet<string>();
             int lineNumber = 0;
             while (!sourceReader.EndOfStream)
             {
                 string line = sourceReader.ReadLine();
-                bwProcessFiles.ReportProgress((int)((lineNumber++ * 100) / numLines));
-                int hash = line.GetHashCode();
-                if (linesHash.Contains(hash))
+                if (!linesString.Contains(line))
                 {
-                    // if destinationWriter contains line string, continue
-                    destinationWriter.Flush();
-                    destinationWriter.Close();
-                    temp = new StreamReader(destinationFilename);
-                    bool found = false;
-                    while (!temp.EndOfStream)
-                    {
-                        if (line == temp.ReadLine())
-                        {
-                            found = true;
-                            dupesCount++;
-                            break;
-                        }
-                    }
-
-                    temp.Close();
-                    destinationWriter = new StreamWriter(destinationFilename, true);
-                    if (found)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        destinationWriter.WriteLine(line);
-                    }
+                    linesString.Add(line);
+                    destinationWriter.WriteLine(line);
                 }
                 else
                 {
-                    linesHash.Add(hash);
-                    destinationWriter.WriteLine(line);
+                    dupesCount++;
+                }
+                if (++lineNumber % 100 == 0)
+                {
+                    string[] workerResult = new string[1];
+                    workerResult[0] = line;
+                    bwProcessFiles.ReportProgress((int)((lineNumber * 100) / numLines), workerResult);
                 }
             }
+            bwProcessFiles.ReportProgress(100, new string[1] { "" });
         }
 
         private void bwProcessFiles_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
+            string[] results = (string[])e.UserState;
             progressBar1.Value = e.ProgressPercentage;
             label1.Text = e.ProgressPercentage.ToString() + "%";
+            lineBox.Text = results[0];
         }
 
         private void bwProcessFiles_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -97,7 +80,8 @@ namespace RemoveDupes
             sourceReader.Close();
             destinationWriter.Flush();
             destinationWriter.Close();
-            label1.Text = dupesCount.ToString();
+            lineBox.Text = dupesCount.ToString() + " duplicates found.";
+            button1.Enabled = true;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -109,6 +93,8 @@ namespace RemoveDupes
                     this.Cursor = Cursors.WaitCursor;
                     sourceFilename = openFileDialog1.FileName;
                     destinationFilename = saveFileDialog1.FileName;
+                    dupesCount = 0;
+                    button1.Enabled = false;
                     bwProcessFiles.RunWorkerAsync();
                 }
             }

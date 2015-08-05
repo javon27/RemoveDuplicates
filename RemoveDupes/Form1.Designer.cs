@@ -22,6 +22,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.label1 = new System.Windows.Forms.Label();
+            this.lineBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -66,11 +67,19 @@
             this.label1.TabIndex = 3;
             this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
+            // lineBox
+            // 
+            this.lineBox.Location = new System.Drawing.Point(12, 79);
+            this.lineBox.Name = "lineBox";
+            this.lineBox.Size = new System.Drawing.Size(742, 20);
+            this.lineBox.TabIndex = 4;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(766, 103);
+            this.Controls.Add(this.lineBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.button1);
@@ -90,6 +99,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox lineBox;
     }
 }
 

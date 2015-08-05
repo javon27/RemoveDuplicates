@@ -32,6 +32,7 @@ namespace RemoveDupes
         {
             var temp = new StreamReader(sourceFilename);
             int numLines = 0;
+            bwProcessFiles.ReportProgress(0, new string[1] { "Checking " + sourceFilename + "..." });
             while (!temp.EndOfStream)
             {
                 temp.ReadLine();
@@ -63,6 +64,8 @@ namespace RemoveDupes
                     bwProcessFiles.ReportProgress((int)((lineNumber * 100) / numLines), workerResult);
                 }
             }
+            linesString.Clear();
+            linesString.TrimExcess();
             bwProcessFiles.ReportProgress(100, new string[1] { "" });
         }
 
@@ -82,6 +85,7 @@ namespace RemoveDupes
             destinationWriter.Close();
             lineBox.Text = dupesCount.ToString() + " duplicates found.";
             button1.Enabled = true;
+            GC.Collect();
         }
 
         private void button1_Click(object sender, EventArgs e)
